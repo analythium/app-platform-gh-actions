@@ -78,12 +78,10 @@ This is an important step. It handles the following:
 
 As it turns out, the image tag needs to be unique to trigger a pull on the App Platform. So it is best to use the git commit SHA.
 
-Using the build cache cuts down the build time if the dependencies have not changed (in this case from 9 minutes to 1 minute).
+Using the build cache cuts down the build time if the dependencies have not changed (in this case from 9-10 minutes to 1 minute).
 
-#### Update app spec
+#### Update app spec and publish the app
 
-This is where we use environment variables and substitute these into the multi-line text, and save it into the `update.yaml` file.
-
-#### Update the app
+This is where we use environment variables and substitute these into contents of the `app.yaml` then save it into the `update.yaml` file.
 
 Finally, update app in App Platform using the new `update.yaml` app spec file. The new file has the updated tag based on the commit SHA, so the image pull will happen as expected.
