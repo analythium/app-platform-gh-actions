@@ -1,0 +1,35 @@
+name: Build Shiny Docker Image and Deploy to Heroku
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  app1:
+    name: Build and deploy Shiny app
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      ## add here your test steps
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Build and push Docker to the App Platform
+        env:
+          USERNAME: "psolymos"
+          DOCKERHUB_API_KEY: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+          IMAGE_TAG: "analythium/gh-action-test:latest"
+          APP_ID: ${{ secrets.APP_ID }}
+        run: |
+          echo ${DOCKERHUB_ACCESS_TOKEN} | docker login \
+            --username=${USERNAME} --password-stdin
+          docker build -t ${IMAGE_TAG} .
+          docker push ${IMAGE_TAG}
+          doctl apps update ${APP_ID}
