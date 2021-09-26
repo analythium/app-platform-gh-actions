@@ -40,7 +40,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
           image_name: analythium/gh-action-test
-          image_tag: ${GITHUB_SHA}
+          image_tag: ${{ github.sha }}
 
 
       - name: Update app spec
