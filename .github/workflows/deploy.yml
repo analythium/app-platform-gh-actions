@@ -9,6 +9,9 @@ jobs:
   app1:
     name: Build and deploy Shiny app
     runs-on: ubuntu-latest
+    env:
+      REGISTRY: "analythium"
+      REPOSITORY: "gh-action-test"
     steps:
 
       - name: Checkout
@@ -21,27 +24,13 @@ jobs:
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-#      - name: Login to Docker Hub
-#        uses: docker/login-action@v1
-#        with:
-#          username: ${{ secrets.DOCKERHUB_USERNAME }}
-#          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-
-#      - name: Build image and push to Docker Hub
-#        env:
-#          IMAGE_TAG: "analythium/gh-action-test:latest"
-#        run: |
-#          docker build -t ${IMAGE_TAG} .
-#          docker push ${IMAGE_TAG}
-
       - name: Docker build with cache
         uses: whoan/docker-build-with-cache-action@v5
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-          image_name: analythium/gh-action-test
+          image_name: ${{ env.REGISTRY }}/${{ env.REPOSITORY }}
           image_tag: ${{ github.sha }}
-
 
       - name: Update app spec
         run: |
@@ -54,9 +43,9 @@ jobs:
           services:
           - http_port: 8080
             image:
-              registry: analythium
+              registry: ${REGISTRY}
               registry_type: DOCKER_HUB
-              repository: gh-action-test
+              repository: ${REPOSITORY}
               tag: ${GITHUB_SHA}
             instance_count: 1
             instance_size_slug: basic-xxs
