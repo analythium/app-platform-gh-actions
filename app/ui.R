@@ -1,5 +1,5 @@
 ui <- fluidPage(
-  titlePanel("Shiny Example - App Platform with GH Actions"),
+  titlePanel("Shiny Example: App Platform with GH Actions"),
   sidebarLayout(
     sidebarPanel(
       sliderInput("bb_x", "Position along x axis",
