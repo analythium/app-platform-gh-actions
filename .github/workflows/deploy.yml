@@ -16,16 +16,10 @@ jobs:
 
       ## add here your test steps here
 
-      - name: DigitalOcean App Platform deployment
-        uses: digitalocean/app_action@main
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
         with:
-          app_name: shiny-app-gh
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-
-#      - name: Install doctl
-#        uses: digitalocean/action-doctl@v2
-#        with:
-#          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
 #      - name: Login to Docker Hub
 #        uses: docker/login-action@v1
@@ -40,16 +34,41 @@ jobs:
 #          docker build -t ${IMAGE_TAG} .
 #          docker push ${IMAGE_TAG}
 
-#      - name: Docker build with cache
-#        uses: whoan/docker-build-with-cache-action@v5
-#        with:
-#          username: ${{ secrets.DOCKERHUB_USERNAME }}
-#          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
-#          image_name: analythium/gh-action-test
-#          image_tag: latest
+      - name: Docker build with cache
+        uses: whoan/docker-build-with-cache-action@v5
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+          image_name: analythium/gh-action-test
+          image_tag: $GITHUB_SHA
 
-#      - name: Update app in App Platform
-#        env:
-#          APP_ID: ${{ secrets.APP_ID }}
-#        run: |
-#          doctl apps update ${APP_ID} --spec app.yaml
+
+      - name: Update app spec
+        run: |
+          cat > update.yaml << EOF
+          alerts:
+          - rule: DEPLOYMENT_FAILED
+          - rule: DOMAIN_FAILED
+          name: shiny-app-gh
+          region: nyc
+          services:
+          - http_port: 8080
+            image:
+              registry: analythium
+              registry_type: DOCKER_HUB
+              repository: gh-action-test
+              tag: ${GITHUB_SHA}
+            instance_count: 1
+            instance_size_slug: basic-xxs
+            name: shiny-app
+            routes:
+            - path: /
+            run_command: R -e "shiny::runApp('/home/app', host = '0.0.0.0', port=as.numeric(Sys.getenv('PORT')))"
+            source_dir: /
+          EOF
+
+      - name: Update app in App Platform
+        env:
+          APP_ID: ${{ secrets.APP_ID }}
+        run: |
+          doctl apps update ${APP_ID} --spec update.yaml
