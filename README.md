@@ -34,17 +34,10 @@ Take note of the app ID at the end: `baf22385-feed-4cb9-99aa-db6b15a0c75e` or so
 
 Add a couple of secrets to the GitHub repo:
 
-- the app ID ($APP_ID) that you will know once the app is initially created,
-- an API token for doctl to work ($DIGITALOCEAN_ACCESS_TOKEN) (make sure write is in the scope),
-- and the access token to your Docker registry ($DOCKERHUB_ACCESS_TOKEN) (make sure write is in the scope).
-
+- `APP_ID`: the app ID from the initial deployment to the App Platform
+- `DIGITALOCEAN_ACCESS_TOKEN`: an API token for `doctl` (make sure write is in the scope)
+- `DOCKERHUB_ACCESS_TOKEN`: access token for Docker Hub (make sure write is in the scope)
+- `DOCKERHUB_USERNAME`: your Docker Hub user name used for registry login
 ### Add the workflow
 
-Then follow these steps following the doctl action as one of the steps:
-
-1. build the Docker image with docker build -t $TAG .,
-2. log in to a registry using  echo $REGISTRY_TOKEN | docker login --username $USERNAME --password-stdin $REGISTRY_NAME where $REGISTRY_NAME can be omitted if you are using Docker Hub ($USERNAME and $REGISTRY_NAME can be added as secrets or as environment variables)
-3. push the image to the registry with docker push $TAG,
-4. update the app using doctl apps update $APP_ID (your access token will be known from the doctl action step).
-
-This way, you can add any tests before the build/push/update steps to prevent a new release when some tests fail.
+see the `.github/workflows/deploy.yml` file for the steps.

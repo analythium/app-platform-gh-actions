@@ -1,4 +1,4 @@
-name: Build Shiny Docker Image and Deploy to Heroku
+name: Build Shiny Docker Image and Deploy to DO App Platform
 
 on:
   push:
@@ -38,4 +38,4 @@ jobs:
         env:
           APP_ID: ${{ secrets.APP_ID }}
         run: |
-          doctl apps update ${APP_ID}
+          doctl apps update ${APP_ID} --spec app.yaml
