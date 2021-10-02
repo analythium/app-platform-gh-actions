@@ -18,7 +18,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      ## add here your test steps here
+      ## add your test steps here
 
       - name: Docker build and push with cache
         uses: whoan/docker-build-with-cache-action@v5
